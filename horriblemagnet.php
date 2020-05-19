@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 	// TODO: Add description
 	
@@ -5,14 +6,48 @@
 	// Corrisponding API URL: https://horriblesubs.info/api.php?method=getshows&type=show&showid=218
 	// Xpath: /html/body/div/div/div[2]/div[2]/div[1]/div/main/div[1]/article/div/script
 	
-	// Load in URL from argument
+	// Check if argument given
+	if(!isset($argv[1])) {
+		die("No link given.".PHP_EOL.
+		    "Usage: ".$argv[0]." link [resolution] [output file]".PHP_EOL);
+	}
+	
+	// Load in URL from argument and check validity of URL
 	$URL = $argv[1];
-	
-	// TODO: add way to select resolution (now extracts 1080p only)
-	
-	// Check validity of URL
 	if(!preg_match('/https:\/\/horriblesubs.info\/shows\/[\w-]+\//', $URL))
 		die("URL does not seem to be valid!".PHP_EOL);
+	
+	// Set resolution
+	$resolution_id=0;
+	if(isset($argv[2])) {
+		switch($argv[2]) {
+			case "480p":
+				$resolution_id=1;
+				echo "Resolution set to 480p".PHP_EOL;
+				break;
+			case "720p":
+				$resolution_id=2;
+				echo "Resolution set to 720p".PHP_EOL;
+				break;
+			case "1080p":
+				$resolution_id=3;
+				echo "Resolution set to 1080p".PHP_EOL;
+				break;
+			default:
+				die("Unrecognised resolution");
+		}
+	} else {
+		$resolution_id=3;
+		echo "Resolution not set. Set to 1080p".PHP_EOL;
+	}
+	
+	// Optionally set output file
+	$output_file_res=false;
+	if(isset($argv[3])) {
+		$output_file_res=@fopen($argv[3], "w");
+		if($output_file_res === false)
+			die("Can't open file for writing".PHP_EOL);
+	}
 	
 	// Load DOM
 	$dom = new DOMDocument();
@@ -34,8 +69,14 @@
 		
 		$xml = simplexml_import_dom($dom_api)->xpath("body/div");
 		foreach($xml as $node) {
-			// Just print the magnet link. Maybe we will add a more sophisticated way later
-			echo $node->xpath("div/div[3]/span[2]/a")[0]["href"].PHP_EOL;
+			$magnet_link=$node->xpath("div/div[$resolution_id]/span[2]/a")[0]["href"];
+			// Either write to file or print to stdout
+			if($output_file_res)
+				fwrite($output_file_res, $magnet_link.PHP_EOL);
+			else
+				echo $magnet_link.PHP_EOL;
 		}
 	}
+	
+	fclose($output_file_res);
 ?>

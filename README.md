@@ -1,8 +1,8 @@
 # horriblemagnet
 A cli tool to extract magnet links from horriblesubs
 
-This tool allows you to extract all magnet links asscoiated to a 'shows' page on horriblesubs and print them to the stdout.
-Horriblemagnet currently only supports outputting the magnet links for the 1080p version of the magnets. Support for the other resolutions is planned.
+This tool allows you to extract all magnet links asscoiated to a 'shows' page on horriblesubs and either print them to stdout or save them to a file.
+You can also select the resolution you want to have (480p, 720p, 1080p).
 
 ## Requirements
 Horriblemagnet is written in PHP and requires the xml module. The script was tested on PHP 7.4 but may possibly run on earlier versions. 
@@ -22,4 +22,4 @@ https://windows.php.net/download/
 ## Usage
 Horriblemagnet does not have any special switches but only one required parameter.
 
-`php horriblemagnet.php <link>`
+`./horriblemagnet.php <link> [resolution] [output file]`
